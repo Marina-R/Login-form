@@ -20,42 +20,39 @@ function start() {
 	$('form').submit(function(e) {
 		e.preventDefault();
 		if (validate() == true) {
-			window.location.replace("http://theironyard.com");
+			window.location.href = "http://theironyard.com";
 		}
 		function validate () {
-			var result = false;
+			var initialValidation = true;
+			if (!validator.isEmail($user.val())) {
+				$('#first').html('Please enter a valid email address.');
+				initialValidation = false;
+			}
 			if($user.val() == '') {
 				$('#first').html('Please enter an email before logging in.');
-				result = false;
-			}
+				initialValidation = false;
+			} 	
 			if ($key.val() == '') {
 				$('#second').html('Please enter a password before logging in.');
-				result = false;
-			}
+				initialValidation = false;
+			} 
 
-			for(var i=0; i<combinations.length; i++) {
-				if (!validator.isEmail($user.val())) {
-					$('#first').html('Please enter a valid email address.');
-					result = false;
-				} else if ($user.val() !== combinations[i].email) {
+			if(initialValidation == true) {
+				var user;
+				for(var i=0; i<combinations.length; i++) {
+					if ($user.val() == combinations[i].email) {
+						user = combinations[i];
+					}
+				}
+				if(user === undefined) {
 					$('#first').html('Your user is not found');
-					result = false;
+				} else if ($key.val() == user.pass) {
+					return true;
 				} else {
-					$('#first').html('');
-				}
-
-				if ($key.val() !== combinations[i].pass) {
 					$('#second').html('The password you entered is incorrect.');
-					result = false;
-				} else {
-					$('#second').html('');
+					return false;
 				}
-				if ($key.val() == combinations[i].pass && $user.val() == combinations[i].email) {
-					result=true;
-				} 
 			}
-			return result;
 		}
-		
 	})
 }
